@@ -1,0 +1,31 @@
+# Eclipse specific files
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*.class
+
+# Eclipse project files
+*.launch
+.settings/
+.project
+.classpath
+
+# Maven / Gradle
+target/
+build/
+*.log
+
+# IDE files
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+
+# Shhh
+src/dump.txt
