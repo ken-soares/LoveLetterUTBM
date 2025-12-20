@@ -1,11 +1,10 @@
 package cartes;
 
-import java.util.Scanner;
-
 import backend.Joueur;
 import backend.Partie;
 
 public class Garde implements Carte {
+	
 
 	@Override
 	public String getNom() {
@@ -23,15 +22,11 @@ public class Garde implements Carte {
 	}
 
 	@Override
-	public void appliquerValeur(Partie partie, Joueur moi, Joueur autre, Scanner scanner) {
-		System.out.println("Entrer nom de la carte du joueur adverse:");
-		String input = scanner.nextLine();
-		for(Carte el: autre.main) {
-			if(el.getNom().equals(input)) {
-				System.out.println("Bien deviné");
-				autre.eliminer();
-				return;
-			}
+	public void appliquerValeur(Partie partie, Joueur moi, Joueur cible) {
+		if (cible.estProtege()) {return;}
+		if(moi.choixCarteDeviner.equals(cible.main.getFirst().getNom())) {
+			System.out.println("Bien deviné");
+			cible.eliminer();
 		}
 		
 		System.out.println("Raté");

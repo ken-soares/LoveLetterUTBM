@@ -24,9 +24,10 @@ public class Roi implements Carte {
 	}
 
 	@Override
-	public void appliquerValeur(Partie partie, Joueur moi, Joueur autre, Scanner scanner) {
+	public void appliquerValeur(Partie partie, Joueur moi, Joueur cible) {
+		if (cible.estProtege()) {return;}
 		ArrayList<Carte> temp = moi.main;
-		autre.main = moi.main;
+		cible.main = moi.main;
 		moi.main = temp;
 	}
 
