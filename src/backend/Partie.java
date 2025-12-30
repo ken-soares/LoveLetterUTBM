@@ -36,74 +36,79 @@ public class Partie {
 	}
 	
 	public void continuerJouer() {
-		
-		switch (gameState) {
-			case GameState.JOUER_CARTE: {
-				
-				if (getJoueurCourant().choixCarte.equals("Prince")
-						|| getJoueurCourant().choixCarte.equals("Roi")){
-					for (Carte carte : getJoueurCourant().main) {
-				        if (carte instanceof Comtesse) {
-				        	System.out.println("Impossible de jouer cette carte,"
-					    			+ " vous devez jouer la comtesse");
-				        }
-				        return; //retour anticipe, impossible de jouer 
-				        		//une autre carte que la comtesse
-					}
-					
-				}
-				
-				System.out.println(getJoueurCourant().nom + " joue "
-						+ getJoueurCourant().choixCarte);
-				
-				if (getJoueurCourant().choixCarte.equals("Garde")
-						|| getJoueurCourant().choixCarte.equals("Pretre")
-						|| getJoueurCourant().choixCarte.equals("Baron")
-						|| getJoueurCourant().choixCarte.equals("Prince")
-						|| getJoueurCourant().choixCarte.equals("Roi")
-						) {
-					setEtatJeu(GameState.CHOIX_CIBLE);
-				} else {
-					getJoueurCourant().jouerCarte(this);
-					setEtatJeu(GameState.TOUR_FINIE);
-				}
-			
-			}
-				
-			case GameState.CHOIX_CIBLE: {
-				for (Joueur joueur : joueurs) {
-					if (joueur.getNom().equals(getJoueurCourant().choixCible)
-							&& !joueur.getNom().equals(getJoueurCourant().getNom())) {
-						if (!joueur.estProtege()) {
-							System.out.println("Ce joueur est protégé, il ne se passe rien");
-							getJoueurCourant().jouerCarte(this);
-							setEtatJeu(GameState.TOUR_FINIE);
-						} else {
-							if (getJoueurCourant().choixCarte.equals("Garde")) {
-								setEtatJeu(GameState.CHOIX_CARTE);
-							} else {
-								getJoueurCourant().jouerCarte(this);
-								setEtatJeu(GameState.TOUR_FINIE);
-							}
-						}
-						
-					}
-				}
-			}
-			
-			case GameState.CHOIX_CARTE:
-				getJoueurCourant().jouerCarte(this);
-				setEtatJeu(GameState.TOUR_FINIE);
-			
-			case GameState.TOUR_FINIE:
-				setEtatJeu(GameState.JOUER_CARTE);
-				joueurSuivant();
-				
-			case GameState.JOUER:
-				
-		}
-		
-		
+	    switch (gameState) {
+	        case JOUER_CARTE: {
+	            // Vérifier si le joueur a une Comtesse et veut jouer Prince/Roi
+	            boolean aComtesse = false;
+	            for (Carte carte : getJoueurCourant().main) {
+	                if (carte instanceof Comtesse) {
+	                    aComtesse = true;
+	                    break;
+	                }
+	            }
+	            
+	            if (aComtesse && (getJoueurCourant().choixCarte.equals("Prince") 
+	                    || getJoueurCourant().choixCarte.equals("Roi"))) {
+	                System.out.println("Impossible de jouer cette carte, vous devez jouer la comtesse");
+	                getJoueurCourant().choixCarte = null;
+	                return;
+	            }
+	            
+	            System.out.println(getJoueurCourant().nom + " joue " + getJoueurCourant().choixCarte);
+	            
+	            if (getJoueurCourant().choixCarte.equals("Garde")
+	                    || getJoueurCourant().choixCarte.equals("Pretre")
+	                    || getJoueurCourant().choixCarte.equals("Baron")
+	                    || getJoueurCourant().choixCarte.equals("Prince")
+	                    || getJoueurCourant().choixCarte.equals("Roi")) {
+	                setEtatJeu(GameState.CHOIX_CIBLE);
+	            } else {
+	                getJoueurCourant().jouerCarte(this);
+	                setEtatJeu(GameState.TOUR_FINIE);
+	            }
+	            break;
+	        }
+	            
+	        case CHOIX_CIBLE: {
+	            Joueur cible = null;
+	            for (Joueur joueur : joueurs) {
+	                if (joueur.getNom().equals(getJoueurCourant().choixCible)) {
+	                    cible = joueur;
+	                    break;
+	                }
+	            }
+	            
+	            if (cible != null) {
+	                if (cible.estProtege()) {
+	                    System.out.println("Ce joueur est protégé, il ne se passe rien");
+	                    getJoueurCourant().jouerCarte(this);
+	                    setEtatJeu(GameState.TOUR_FINIE);
+	                } else {
+	                    if (getJoueurCourant().choixCarte.equals("Garde")) {
+	                        setEtatJeu(GameState.CHOIX_CARTE);
+	                    } else {
+	                        getJoueurCourant().jouerCarte(this);
+	                        setEtatJeu(GameState.TOUR_FINIE);
+	                    }
+	                }
+	            }
+	            break;
+	        }
+	            
+	        case CHOIX_CARTE:
+	            getJoueurCourant().jouerCarte(this);
+	            setEtatJeu(GameState.TOUR_FINIE);
+	            break;
+	            
+	        case TOUR_FINIE:
+	            joueurSuivant();
+	            setEtatJeu(GameState.JOUER_CARTE);
+	            break;
+	            
+	        case JOUER:
+	            // Gestion de l'état JOUER
+	            break;
+	    }
 	}
 	
 	/*

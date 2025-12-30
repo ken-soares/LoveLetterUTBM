@@ -45,17 +45,33 @@ public class Joueur {
 		}
 		
 		Carte carteAJouer = null;
-		for (Carte carte : main) {
-			if (carte.getNom().equals(choixCarte)) {
-				System.out.println("coucou");
-				carteAJouer = carte;
-			}
-		}
-		System.out.println(carteAJouer);
-		carteAJouer.appliquerValeur(partie, this, cible);
-		choixCible = null;
-		choixCarte = null;
-		choixCarteDeviner = null;
+	    int indexCarte = -1;
+	    
+	    for (int i = 0; i < main.size(); i++) {
+	        Carte carte = main.get(i);
+	        if (carte.getNom().equals(choixCarte)) {
+	            carteAJouer = carte;
+	            indexCarte = i;
+	            break;
+	        }
+	    }
+	    
+	    if (carteAJouer == null) {
+	        System.out.println("Erreur: Carte non trouvée dans la main!");
+	        return;
+	    }
+	    
+	    // Retirer la carte de la main et l'ajouter à la défausse
+	    main.remove(indexCarte);
+	    defausse.add(carteAJouer);
+	    
+	    // Appliquer l'effet de la carte
+	    carteAJouer.appliquerValeur(partie, this, cible);
+	    
+	    // Réinitialiser les choix
+	    choixCible = null;
+	    choixCarte = null;
+	    choixCarteDeviner = null;
 	}
 	
 	public void eliminer() {
