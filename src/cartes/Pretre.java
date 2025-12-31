@@ -1,15 +1,14 @@
 package cartes;
 
-import java.util.Scanner;
-
 import backend.Joueur;
 import backend.Partie;
 
 public class Pretre implements Carte {
 
 	@Override
-	public void appliquerValeur(Partie partie, Joueur moi, Joueur autre, Scanner scanner) {
-		for(Carte c : autre.main) {
+	public void appliquerValeur(Partie partie, Joueur moi, Joueur cible) {
+		if (cible.estProtege()) {return;}
+		for(Carte c : cible.main) {
 			System.out.println("Main de l'autre joueur: " + c.getNom());
 		}
 	}
@@ -28,5 +27,4 @@ public class Pretre implements Carte {
 	public String getEffet() {
 		return "Regarder la main d’un autre joueur";
 	}
-
 }
