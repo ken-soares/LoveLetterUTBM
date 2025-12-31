@@ -16,7 +16,9 @@ public class Joueur {
 	public String choixCible;
 	public String choixCarte;
 	public String choixCarteDeviner;
-	
+
+	public Joueur cible = null;
+
 	public Joueur(String nom) {
 		main = new ArrayList<Carte>();
 		defausse = new ArrayList<Carte>();
@@ -26,6 +28,7 @@ public class Joueur {
 	public String getNom() {
 		return nom;
 	}
+	
 	
 	public boolean estProtege() {
 		return this.protege;
@@ -37,7 +40,6 @@ public class Joueur {
 	
 	public void jouerCarte(Partie partie) {
 		//TODO verifier le fonctionnement
-		Joueur cible = null;
 		for (Joueur joueur : partie.joueurs) {
 			if (joueur.getNom().equals(choixCible)) {
 				cible = joueur;

@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import cartes.Carte;
 
@@ -96,6 +99,29 @@ public class GamePanel extends JPanel {
 			partie.continuerJouer();
 			updateGamePanel(); 
 		});
+		
+		if(!partie.getJoueurCourant().estElimine() && 
+		   !partie.getJoueurCourant().defausse.isEmpty() && 
+		    partie.getJoueurCourant().defausse.getLast().getNom().equals("Pretre")) {
+
+			JDialog overlay = new JDialog(SwingUtilities.getWindowAncestor(panel));
+			overlay.setAlwaysOnTop(true);
+			overlay.setSize(300, 200);
+			overlay.setLocationRelativeTo(panel);
+
+			JPanel content = new JPanel();
+			content.setBackground(Color.WHITE);
+
+			content.add(new JLabel("Main de " + partie.getJoueurCourant().cible.getNom() + ": "));
+			for (Carte c : partie.getJoueurCourant().cible.main) {
+			    content.add(new JLabel(c.getNom()));
+			}
+
+			overlay.add(content);
+			overlay.setVisible(true);
+			partie.getJoueurCourant().cible = null;
+		}
+
 		panel.add(FinTourButton, BorderLayout.SOUTH);
 		return panel;
 	}
@@ -127,7 +153,8 @@ public class GamePanel extends JPanel {
 		cartesPanel.add(nomJoueurLabel);
 		for (Carte carte : partie.getJoueurCourant().main) {
 			
-			JButton carteButton = new JButton(carte.getNom());
+			JButton carteButton = new JButton("(" + carte.getPoints() + ") " + carte.getNom());
+			carteButton.setToolTipText(carte.getEffet());
 			
 			carteButton.addActionListener(e -> {
 				
