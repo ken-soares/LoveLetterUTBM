@@ -30,8 +30,7 @@ public class Partie {
 		indexCourant = 0;
 		
 		this.paquet = new Paquet();
-		j2.elimine = true;
-		this.setEtatJeu(GameState.JOUER_CARTE);
+		this.setEtatJeu(GameState.JOUER);
 		nouvelleManche();
 	}
 	
@@ -68,7 +67,7 @@ public class Partie {
 	            }
 	            break;
 	        }
-	            
+
 	        case CHOIX_CIBLE: {
 	            Joueur cible = null;
 	            for (Joueur joueur : joueurs) {
@@ -101,61 +100,21 @@ public class Partie {
 	            break;
 	            
 	        case TOUR_FINIE:
-	            joueurSuivant();
-	            setEtatJeu(GameState.JOUER_CARTE);
+	        	if (finManche()) {
+	        		setEtatJeu(GameState.JOUER);
+	        	} else {
+	        		joueurSuivant();
+		            setEtatJeu(GameState.JOUER_CARTE);
+	        	}
 	            break;
 	            
 	        case JOUER:
-	            // Gestion de l'état JOUER
+	        	setEtatJeu(GameState.JOUER_CARTE);
 	            break;
 	    }
 	}
 	
-	/*
-    public void demarrerManche() {
-        System.out.println("=== Nouvelle manche ===");
-
-        // Réinitialiser paquet et mélange
-        paquet = new Paquet();
-        paquet.melanger();
-        
-        // Réinitialiser les mains et défausse des joueurs
-        for (Joueur j : joueurs) {
-            j.main.clear();
-            j.defausse.clear();
-        }
-
-        mancheFinie = false;
-
-        for (Joueur j : joueurs) {
-            j.piocher(paquet);
-        }
-
-        // Commencer les tours
-        joueurCourant = joueurs.getFirst();
-        if (mancheFinie) return; //TODO fin de jeu
-        
-        
-        
-        
-        
-        while (!mancheFinie) {
-            for (Joueur j : joueurs) {
-                if (!j.estElimine()) {
-                	this.setJoueurCourant(j);
-                    JouerTour(j);
-                    verifierFinManche();
-                    if (mancheFinie) break;
-                }
-            }
-        }
-
-        determinerVainqueur();
-    }
-	*/
-	
 	public void nouvelleManche() {
-		System.out.println("=== Nouvelle manche ===");
 
         // Réinitialiser paquet et mélange
         paquet = new Paquet();
@@ -165,6 +124,7 @@ public class Partie {
         for (Joueur j : joueurs) {
             j.main.clear();
             j.defausse.clear();
+            j.elimine = false;
         }
 
         for (Joueur j : joueurs) {
@@ -181,7 +141,8 @@ public class Partie {
     }
 	
     
-    public void verifierFinManche() {
+    public boolean finManche() {
+    	
         int joueursRestants = 0;
 
         for (Joueur j : joueurs) {
@@ -192,31 +153,36 @@ public class Partie {
 
         // Manche finie si un seul joueur reste ou plus de cartes à piocher
         if (joueursRestants <= 1 || paquet.estVide()) {
-            gameState = GameState.JOUER;
+        	determinerVainqueur();
+            return true;
         }
+        return false;
     }
     
     
 	
     public void determinerVainqueur() {
-        Joueur vainqueur = null;
         int meilleurPoints = -1;
 
         for (Joueur j : joueurs) {
             if (!j.estElimine()) {
-                int points = j.main.getFirst().getPoints();
+            	System.out.println(j.getNom());
+            	System.out.println(j.main);
+            	int points = j.main.getFirst().getPoints();
                 if (points > meilleurPoints) {
                     meilleurPoints = points;
-                    vainqueur = j;
                 }
             }
         }
-
-        if (vainqueur != null) {
-            System.out.println("\n=== La manche est terminée ! ===");
-            System.out.println("Vainqueur : " + vainqueur.getNom() + " avec " + meilleurPoints + " points !");
-        } else {
-            System.out.println("Égalité, aucun vainqueur clair !");
+        
+        if (meilleurPoints != -1) {
+        	for (Joueur j : joueurs) {
+        		if (!j.estElimine()) {
+        			if (j.main.getFirst().getPoints() == meilleurPoints) {
+        				j.points ++;
+        			}
+        		}
+        	}
         }
     }
     
@@ -234,9 +200,11 @@ public class Partie {
     
     // definie le prochain joueur à jouer comme joueurCourant
     public void joueurSuivant() {
-        indexCourant = (indexCourant + 1) % joueurs.size();
-        getJoueurCourant().piocher(paquet);
+    	indexCourant = (indexCourant + 1) % joueurs.size();
+    	while (joueurs.get(indexCourant).estElimine()) {
+    		indexCourant = (indexCourant + 1) % joueurs.size();
+    	}
+    	getJoueurCourant().piocher(paquet);
         getJoueurCourant().setProtege(false);
-        
     }
 }

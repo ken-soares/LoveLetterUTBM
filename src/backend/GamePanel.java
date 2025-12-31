@@ -2,6 +2,7 @@ package backend;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class GamePanel extends JPanel {
 	private JPanel choixCiblePanel;
 	private JPanel choixCartePanel;
 	private JPanel FinTourPanel;
+	private JPanel DebutJeuPanel;
 	
 	public GamePanel(Partie partie) {
 		this.partie = partie;
@@ -36,29 +38,50 @@ public class GamePanel extends JPanel {
 		add(ecransPanel, BorderLayout.CENTER);
         panels = new HashMap<>();
 		
+        panels.put(GameState.JOUER, creationDebutJeuPanel());
         panels.put(GameState.JOUER_CARTE, creationTablePanel());
         panels.put(GameState.CHOIX_CIBLE, creationChoixCiblePanel());
         panels.put(GameState.CHOIX_CARTE, creationChoixCartePanel());
-        panels.put(GameState.TOUR_FINIE, creationFinTourPanel());
-        
+        panels.put(GameState.TOUR_FINIE, creationFinTourPanel());        
         
         for (Map.Entry<GameState, JPanel> entry : panels.entrySet()) {
         	ecransPanel.add(entry.getValue(), entry.getKey().name());
         }
         
         
-        cardLayout.show(ecransPanel, GameState.JOUER_CARTE.name());
+        cardLayout.show(ecransPanel, GameState.JOUER.name());
            
 	}
 	
+	public JPanel creationDebutJeuPanel() {
+		JPanel panel = new JPanel(new GridLayout(5,1));
+		JButton startButton = new JButton("Jouer");
+		startButton.addActionListener(e -> {
+			partie.nouvelleManche();
+		    updateGamePanel();
+		});
+		panel.add(startButton);
+		for (Joueur joueur : partie.joueurs) {
+			JLabel joueurLabel = new JLabel("Point de " + joueur.getNom() +" : "+ joueur.points);
+			panel.add(joueurLabel);
+		}
+		return panel;
+	}
+
 	public JPanel creationFinTourPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		JPanel defaussesPanel = new JPanel(new GridLayout(2,2));
+		JLabel piocheLabel = new JLabel("pioche :"+partie.paquet.taille()+" cartes");
+		panel.add(piocheLabel, BorderLayout.EAST);
 		JPanel cartesPanel = new JPanel();
 		
 		for (Joueur joueur : partie.joueurs) {
 			JPanel defaussePanel = new JPanel();
 			JLabel nomJoueurLabel = new JLabel(joueur.getNom() + " :");
+			if (joueur.elimine) {
+				nomJoueurLabel.setText(joueur.getNom() + " (éliminé) :");
+				nomJoueurLabel.setForeground(Color.RED);
+			}
 			defaussePanel.add(nomJoueurLabel);
 			for (Carte carte : joueur.defausse) {
 				JLabel carteLabel = new JLabel(carte.getNom());
@@ -80,11 +103,17 @@ public class GamePanel extends JPanel {
 	public JPanel creationTablePanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		JPanel defaussesPanel = new JPanel(new GridLayout(2,2));
+		JLabel piocheLabel = new JLabel("pioche :"+partie.paquet.taille()+" cartes");
+		panel.add(piocheLabel, BorderLayout.EAST);
 		JPanel cartesPanel = new JPanel();
 		
 		for (Joueur joueur : partie.joueurs) {
 			JPanel defaussePanel = new JPanel();
 			JLabel nomJoueurLabel = new JLabel(joueur.getNom() + " :");
+			if (joueur.elimine) {
+				nomJoueurLabel.setText(joueur.getNom() + " (éliminé) :");
+				nomJoueurLabel.setForeground(Color.RED);
+			}
 			defaussePanel.add(nomJoueurLabel);
 			for (Carte carte : joueur.defausse) {
 				JLabel carteLabel = new JLabel(carte.getNom());
@@ -94,6 +123,8 @@ public class GamePanel extends JPanel {
 		}
 		panel.add(defaussesPanel, BorderLayout.CENTER);
 		
+		JLabel nomJoueurLabel = new JLabel("Tour de : " + partie.getJoueurCourant().getNom());
+		cartesPanel.add(nomJoueurLabel);
 		for (Carte carte : partie.getJoueurCourant().main) {
 			
 			JButton carteButton = new JButton(carte.getNom());
@@ -101,17 +132,12 @@ public class GamePanel extends JPanel {
 			carteButton.addActionListener(e -> {
 				
 				partie.getJoueurCourant().choixCarte = carte.getNom();
-				System.out.println("Protege42");
 			    partie.continuerJouer();
-			    System.out.println("Protege1");
 			    updateGamePanel();
-			    System.out.println("Protege2");
-			    
-			    
-			    
 			});
 			
 			cartesPanel.add(carteButton);
+			
 		}
 		
 		panel.add(cartesPanel, BorderLayout.SOUTH);
@@ -173,6 +199,7 @@ public class GamePanel extends JPanel {
 	    ecransPanel.removeAll();
 	    
 	    panels.clear();
+	    panels.put(GameState.JOUER, creationDebutJeuPanel());
 	    panels.put(GameState.JOUER_CARTE, creationTablePanel());
 	    panels.put(GameState.CHOIX_CIBLE, creationChoixCiblePanel());
 	    panels.put(GameState.CHOIX_CARTE, creationChoixCartePanel());
